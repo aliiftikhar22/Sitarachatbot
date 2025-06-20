@@ -43,4 +43,6 @@ def chat():
         return jsonify({"reply": "Please ask about mobiles, ACs, ovens, or other electronics. / Bara e meharbani, sawal mobile, fridge, ya kisi aur product ka poochein."})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
