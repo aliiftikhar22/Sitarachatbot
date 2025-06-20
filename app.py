@@ -50,7 +50,7 @@ def chat():
 # ============================
 # Webhook Endpoint (GET/POST)
 # ============================
-VERIFY_TOKEN = "EAAOPI7KEnMUBO0zWNhF2LgmrYsl9BCSXuL3r7olp8nCbn6PxScNZChmV6Vaf3ZBymXFQV5oPO2iTwVUgB81q9cMPTfjHQROdBD369yQIXZCyG8yTOiEZB1e73lHTZCBhpoBrt9nZCZCznfqlO79jJpLQMEf1697ohzyAlmJNPnAhyYZC3HaKNlIXFOaZCVTKnkvSZC3yEKiesD"
+VERIFY_TOKEN = "sitara123"
 
 @app.route("/webhook", methods=["GET", "POST"])
 def webhook():
