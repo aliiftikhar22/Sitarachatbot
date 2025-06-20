@@ -1,7 +1,12 @@
 from flask import Flask, request, jsonify
+import os
+import requests
 
 app = Flask(__name__)
 
+# ================================
+# Chatbot Endpoint for App/Postman
+# ================================
 @app.route("/chat", methods=["POST"])
 def chat():
     user_input = request.json.get("message", "").lower()
@@ -23,7 +28,7 @@ def chat():
     elif "hello" in user_input or "hi" in user_input:
         return jsonify({"reply": "Welcome to our electronics & mobile shop! How can I help you?"})
 
-    # Urdu language support
+    # Urdu support
     elif "mobile chahiye" in user_input or "mobiles hain" in user_input:
         return jsonify({"reply": "Haan jee, humare paas Samsung, Vivo, Infinix aur ziada brands hain."})
     elif "ac chahiye" in user_input or "ac hai" in user_input:
@@ -38,11 +43,47 @@ def chat():
         return jsonify({"reply": "Wireless speaker aur handsfree Rs. 1,000 se start hotay hain."})
     elif "owner kaun hai" in user_input or "dukan ka malik" in user_input:
         return jsonify({"reply": "Sitara Center ke malik Mian Iftikhar Ahmed hain."})
-    
+
     else:
         return jsonify({"reply": "Please ask about mobiles, ACs, ovens, or other electronics. / Bara e meharbani, sawal mobile, fridge, ya kisi aur product ka poochein."})
 
+# ============================
+# Webhook Endpoint (GET/POST)
+# ============================
+VERIFY_TOKEN = "EAAOPI7KEnMUBO0zWNhF2LgmrYsl9BCSXuL3r7olp8nCbn6PxScNZChmV6Vaf3ZBymXFQV5oPO2iTwVUgB81q9cMPTfjHQROdBD369yQIXZCyG8yTOiEZB1e73lHTZCBhpoBrt9nZCZCznfqlO79jJpLQMEf1697ohzyAlmJNPnAhyYZC3HaKNlIXFOaZCVTKnkvSZC3yEKiesD"
+
+@app.route("/webhook", methods=["GET", "POST"])
+def webhook():
+    if request.method == "GET":
+        # Facebook/Meta webhook verification
+        token = request.args.get("hub.verify_token")
+        challenge = request.args.get("hub.challenge")
+        if token == VERIFY_TOKEN:
+            return challenge
+        return "Invalid verification token", 403
+
+    elif request.method == "POST":
+        data = request.get_json()
+        print("Webhook data received:", data)
+
+        # Example: handle incoming messages from WhatsApp/Messenger (optional)
+        try:
+            for entry in data.get("entry", []):
+                for change in entry.get("changes", []):
+                    value = change.get("value", {})
+                    messages = value.get("messages")
+                    if messages:
+                        sender = messages[0]["from"]
+                        text = messages[0]["text"]["body"]
+                        print(f"Message from {sender}: {text}")
+        except Exception as e:
+            print("Webhook error:", e)
+
+        return "Webhook received", 200
+
+# =====================
+# Required for Render
+# =====================
 if __name__ == "__main__":
-    import os
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
