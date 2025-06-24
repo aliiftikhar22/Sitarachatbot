@@ -50,7 +50,7 @@ def chat():
 # ============================
 # Webhook Endpoint (GET/POST)
 # ============================
-VERIFY_TOKEN = "sitara123"
+VERIFY_TOKEN = "sitara123"  
 
 @app.route("/webhook", methods=["GET", "POST"])
 def webhook():
@@ -58,15 +58,17 @@ def webhook():
         # Facebook/Meta webhook verification
         token = request.args.get("hub.verify_token")
         challenge = request.args.get("hub.challenge")
-        if token == VERIFY_TOKEN:
-            return challenge
+        mode = request.args.get("hub.mode")
+
+        if token == VERIFY_TOKEN and mode == "subscribe":
+            return challenge, 200
         return "Invalid verification token", 403
 
     elif request.method == "POST":
         data = request.get_json()
         print("Webhook data received:", data)
 
-        # Example: handle incoming messages from WhatsApp/Messenger (optional)
+        # Example: handle incoming messages from WhatsApp or Messenger
         try:
             for entry in data.get("entry", []):
                 for change in entry.get("changes", []):
