@@ -57,7 +57,7 @@ def chat():
 # Webhook Endpoint (Facebook)
 # ================================
 VERIFY_TOKEN = "sitara123"
-PAGE_ACCESS_TOKEN = "EAAOPI7KEnMUBO6vMlADCl9foBQqfmNkDj6dNDr86a3lIb5IRsU3JaG818ZCjpGZBFE3OM1EVU6uCYZApAZAqgkZAjxRWEAGY70HvNUMy2Sfy7lAJHllG7ow3PomnEpGpNs7XbwAEPxYXEfqka20H2ys1hZCn3PVnqEA5CMbPDoublu0R3lmrXTUqg9wzICU6eOkmFvpHmD"
+PAGE_ACCESS_TOKEN = "EAAOPI7KEnMUBOzDB0ovDf6ZBJ4mXiMDjikUQL9zCJCPMERx0E4G5I49YZCVicTZBFW7NzYhUbZBly5KV2vtdcxZAtl8ZCIijf01JGGvZBgoESbpwN2wKZC3hZBZAaO0IpCsGwzui6UhpB7erKZA5N4BFPcehUWfuNwZAdo9JbsEh1oPmokZBQEyC5bxxlObXJlHLMtIFktG1q9ACc"
 
 def send_reply(sender_id, reply_text):
     url = f"https://graph.facebook.com/v19.0/me/messages?access_token={PAGE_ACCESS_TOKEN}"
