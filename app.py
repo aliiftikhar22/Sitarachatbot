@@ -21,31 +21,31 @@ def get_bot_reply(user_input):
         return "We have microwaves starting from Rs. 17,000."
     elif "speaker" in user_input or "handsfree" in user_input:
         return "We have wireless speakers and handsfree starting from Rs. 1,000."
-    elif "owner" in user_input or "who is the owner" in user_input or "shop owner" in user_input:
-        return "Mian Iftikhar Ahmed is the owner of the Sitara Center. Phone number: 0322-8452672"
+    elif "owner" in user_input or "shop owner" in user_input:
+        return "Mian Iftikhar Ahmed is the owner of the Sitara Center. Phone: 0322-8452672"
     elif "contact" in user_input or "number" in user_input or "phone" in user_input or "whatsapp" in user_input:
-        return "For Mobile phones and accessories: 📱 0306-4575272\nHome Appliances: 📞 0323-4537911"
+        return "📱 Mobile & accessories: 0306-4575272\n🏠 Home Appliances: 0323-4537911"
     elif "hello" in user_input or "hi" in user_input:
-        return "Welcome to our electronics & mobile shop! How can I help you?"
+        return "Welcome to Sitara Center! How can I help you?"
     elif "mobile chahiye" in user_input or "mobiles hain" in user_input:
-        return "Haan jee, humare paas Samsung, Vivo, Infinix aur ziada brands hain."
+        return "Haan jee, Samsung, Vivo, Infinix aur ziada brands available hain."
     elif "ac chahiye" in user_input or "ac hai" in user_input:
-        return "Jee haan, humare AC Rs. 115,000 se start hotay hain."
+        return "AC Rs. 115,000 se start hotay hain."
     elif "fridge chahiye" in user_input or "refrigerator hai" in user_input:
         return "Fridges Rs. 55,000 se start hotay hain."
     elif "washing machine chahiye" in user_input or "machine hai" in user_input:
-        return "Jee, humare paas top-load washing machines Rs. 16,000 se milti hain."
+        return "Top-load washing machines Rs. 16,000 se milti hain."
     elif "oven chahiye" in user_input or "microwave hai" in user_input:
-        return "Microwave aur ovens Rs. 17,000 se start hotay hain."
+        return "Microwaves Rs. 17,000 se start hotay hain."
     elif "speaker hai" in user_input or "handsfree chahiye" in user_input:
         return "Wireless speaker aur handsfree Rs. 1,000 se start hotay hain."
     elif "owner kaun hai" in user_input or "dukan ka malik" in user_input:
         return "Sitara Center ke malik Mian Iftikhar Ahmed hain."
     else:
-        return "Please ask about mobiles, ACs, ovens, or other electronics. / Bara e meharbani, sawal mobile, fridge, ya kisi aur product ka poochein."
+        return "Please ask about mobiles, ACs, or electronics. / Bara-e-meherbani mobile ya kisi aur product ka poochein."
 
 # ================================
-# Chatbot Endpoint for Postman
+# POSTMAN Chatbot Endpoint
 # ================================
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -54,7 +54,7 @@ def chat():
     return jsonify({"reply": reply})
 
 # ================================
-# Webhook Endpoint (Facebook)
+# Webhook: GET for verification / POST for reply
 # ================================
 VERIFY_TOKEN = "sitara123"
 PAGE_ACCESS_TOKEN = "EAAOPI7KEnMUBOzDB0ovDf6ZBJ4mXiMDjikUQL9zCJCPMERx0E4G5I49YZCVicTZBFW7NzYhUbZBly5KV2vtdcxZAtl8ZCIijf01JGGvZBgoESbpwN2wKZC3hZBZAaO0IpCsGwzui6UhpB7erKZA5N4BFPcehUWfuNwZAdo9JbsEh1oPmokZBQEyC5bxxlObXJlHLMtIFktG1q9ACc"
@@ -66,7 +66,8 @@ def send_reply(sender_id, reply_text):
         "recipient": {"id": sender_id},
         "message": {"text": reply_text}
     }
-    requests.post(url, headers=headers, json=payload)
+    response = requests.post(url, headers=headers, json=payload)
+    print("Message sent:", response.status_code, response.text)
 
 @app.route("/webhook", methods=["GET", "POST"])
 def webhook():
@@ -78,32 +79,30 @@ def webhook():
             return challenge, 200
         return "Invalid verification token", 403
 
-   elif request.method == "POST":
-    data = request.get_json()
-    print("Webhook data received:", data)
+    elif request.method == "POST":
+        data = request.get_json()
+        print("Webhook data received:", data)
 
-    try:
-        for entry in data.get("entry", []):
-            for change in entry.get("changes", []):
-                value = change.get("value", {})
-                print("Change value:", value)
+        try:
+            for entry in data.get("entry", []):
+                for change in entry.get("changes", []):
+                    value = change.get("value", {})
+                    messages = value.get("messages", [])
+                    print("Parsed messages:", messages)
 
-                messages = value.get("messages", [])
-                print("Messages found:", messages)
+                    if messages:
+                        sender = messages[0]["from"]
+                        text = messages[0]["text"]["body"]
+                        print(f"📨 Message from {sender}: {text}")
+                        reply_text = get_bot_reply(text)
+                        send_reply(sender, reply_text)
+        except Exception as e:
+            print("Webhook error:", e)
 
-                if messages:
-                    sender = messages[0]["from"]
-                    text = messages[0]["text"]["body"]
-                    print(f"📩 Message from {sender}: {text}")
-                    reply_text = get_bot_reply(text)
-                    send_reply(sender, reply_text)
-    except Exception as e:
-        print("Webhook error:", e)
-
-    return "Webhook received", 200
+        return "Webhook received", 200
 
 # =====================
-# Required for Render
+# Render Deployment
 # =====================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
