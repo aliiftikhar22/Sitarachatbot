@@ -55,7 +55,7 @@ VERIFY_TOKEN = "sitara123"
 @app.route("/webhook", methods=["GET", "POST"])
 def webhook():
     if request.method == "GET":
-        # Facebook/Meta webhook verification
+        # Facebook webhook verification
         token = request.args.get("hub.verify_token")
         challenge = request.args.get("hub.challenge")
         mode = request.args.get("hub.mode")
@@ -65,10 +65,10 @@ def webhook():
         return "Invalid verification token", 403
 
     elif request.method == "POST":
+        # Handle incoming webhook message
         data = request.get_json()
         print("Webhook data received:", data)
 
-        # Example: handle incoming messages from WhatsApp or Messenger
         try:
             for entry in data.get("entry", []):
                 for change in entry.get("changes", []):
