@@ -78,23 +78,29 @@ def webhook():
             return challenge, 200
         return "Invalid verification token", 403
 
-    elif request.method == "POST":
-        data = request.get_json()
-        print("Webhook data received:", data)
-        try:
-            for entry in data.get("entry", []):
-                for change in entry.get("changes", []):
-                    value = change.get("value", {})
-                    messages = value.get("messages")
-                    if messages:
-                        sender = messages[0]["from"]
-                        text = messages[0]["text"]["body"]
-                        print(f"Message from {sender}: {text}")
-                        reply_text = get_bot_reply(text)
-                        send_reply(sender, reply_text)
-        except Exception as e:
-            print("Webhook error:", e)
-        return "Webhook received", 200
+   elif request.method == "POST":
+    data = request.get_json()
+    print("Webhook data received:", data)
+
+    try:
+        for entry in data.get("entry", []):
+            for change in entry.get("changes", []):
+                value = change.get("value", {})
+                print("Change value:", value)
+
+                messages = value.get("messages", [])
+                print("Messages found:", messages)
+
+                if messages:
+                    sender = messages[0]["from"]
+                    text = messages[0]["text"]["body"]
+                    print(f"📩 Message from {sender}: {text}")
+                    reply_text = get_bot_reply(text)
+                    send_reply(sender, reply_text)
+    except Exception as e:
+        print("Webhook error:", e)
+
+    return "Webhook received", 200
 
 # =====================
 # Required for Render
