@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 import os
-import requests
 
 app = Flask(__name__)
 
@@ -24,7 +23,9 @@ def chat():
     elif "speaker" in user_input or "handsfree" in user_input:
         return jsonify({"reply": "We have wireless speakers and handsfree starting from Rs. 1,000."})
     elif "owner" in user_input or "who is the owner" in user_input or "shop owner" in user_input:
-        return jsonify({"reply": "Mian Iftikhar Ahmed is the owner of the Sitara Center."})
+        return jsonify({"reply": "Mian Iftikhar Ahmed is the owner of the Sitara Center. Phone number: 0322-8452672"})
+    elif "contact" in user_input or "number" in user_input or "phone" in user_input or "whatsapp" in user_input:
+        return jsonify({"reply": "For Mobile phones and accessories: 📱 0306-4575272\nHome Appliances: 📞 0323-4537911"})
     elif "hello" in user_input or "hi" in user_input:
         return jsonify({"reply": "Welcome to our electronics & mobile shop! How can I help you?"})
 
@@ -43,19 +44,18 @@ def chat():
         return jsonify({"reply": "Wireless speaker aur handsfree Rs. 1,000 se start hotay hain."})
     elif "owner kaun hai" in user_input or "dukan ka malik" in user_input:
         return jsonify({"reply": "Sitara Center ke malik Mian Iftikhar Ahmed hain."})
-
     else:
         return jsonify({"reply": "Please ask about mobiles, ACs, ovens, or other electronics. / Bara e meharbani, sawal mobile, fridge, ya kisi aur product ka poochein."})
 
 # ============================
 # Webhook Endpoint (GET/POST)
 # ============================
-VERIFY_TOKEN = "sitara123"  
+
+VERIFY_TOKEN = "tara123"
 
 @app.route("/webhook", methods=["GET", "POST"])
 def webhook():
     if request.method == "GET":
-        # Facebook webhook verification
         token = request.args.get("hub.verify_token")
         challenge = request.args.get("hub.challenge")
         mode = request.args.get("hub.mode")
@@ -65,7 +65,6 @@ def webhook():
         return "Invalid verification token", 403
 
     elif request.method == "POST":
-        # Handle incoming webhook message
         data = request.get_json()
         print("Webhook data received:", data)
 
@@ -84,7 +83,7 @@ def webhook():
         return "Webhook received", 200
 
 # =====================
-# Required for Render
+# Required for Local Run
 # =====================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
