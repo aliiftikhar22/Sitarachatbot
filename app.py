@@ -71,35 +71,31 @@ def send_reply(sender_id, reply_text):
 
 @app.route("/webhook", methods=["GET", "POST"])
 def webhook():
-    if request.method == "GET":
-        token = request.args.get("hub.verify_token")
-        challenge = request.args.get("hub.challenge")
-        mode = request.args.get("hub.mode")
-        if token == VERIFY_TOKEN and mode == "subscribe":
-            return challenge, 200
-        return "Invalid verification token", 403
+    if request.method == "GET":
+        token = request.args.get("hub.verify_token")
+        challenge = request.args.get("hub.challenge")
+        mode = request.args.get("hub.mode")
+        if token == VERIFY_TOKEN and mode == "subscribe":
+            return challenge, 200
+        return "Invalid verification token", 403
 
-    elif request.method == "POST":
-        data = request.get_json()
-        print("Webhook data received:", data)
+    elif request.method == "POST":
+        data = request.get_json()
+        print("Webhook data received:", data)
 
-        try:
-            for entry in data.get("entry", []):
-                for change in entry.get("changes", []):
-                    value = change.get("value", {})
-                    messages = value.get("messages", [])
-                    print("Parsed messages:", messages)
+        try:
+            for entry in data.get("entry", []):
+                for messaging_event in entry.get("messaging", []):
+                    sender_id = messaging_event["sender"]["id"]
+                    if "message" in messaging_event:
+                        text = messaging_event["message"].get("text")
+                        print(f"📨 Message from {sender_id}: {text}")
+                        reply_text = get_bot_reply(text)
+                        send_reply(sender_id, reply_text)
+        except Exception as e:
+            print("Webhook error:", e)
 
-                    if messages:
-                        sender = messages[0]["from"]
-                        text = messages[0]["text"]["body"]
-                        print(f"📨 Message from {sender}: {text}")
-                        reply_text = get_bot_reply(text)
-                        send_reply(sender, reply_text)
-        except Exception as e:
-            print("Webhook error:", e)
-
-        return "Webhook received", 200
+        return "Webhook received", 200
 
 # =====================
 # Render Deployment
