@@ -67,7 +67,7 @@ def send_reply(sender_id, reply_text):
         "message": {"text": reply_text}
     }
     response = requests.post(url, headers=headers, json=payload)
-    print("Message sent:", response.status_code, response.text)
+    print("Facebook API response:", response.status_code, response.text)
 
 @app.route("/webhook", methods=["GET", "POST"])
 def webhook():
