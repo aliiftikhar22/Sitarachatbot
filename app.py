@@ -23,7 +23,7 @@ def get_bot_reply(user_input):
         return "We have wireless speakers and handsfree starting from Rs. 1,000."
     elif "owner" in user_input or "shop owner" in user_input:
         return "Mian Iftikhar Ahmed is the owner of the Sitara Center. Phone: 0322-8452672"
-    elif "contact" in user_input or "number" in user_input or "phone" in user_input or "whatsapp" in user_input:
+    elif "number" in user_input or "phone" in user_input or "whatsapp" in user_input:
         return "📱 Mobile & accessories: 0306-4575272\n🏠 Home Appliances: 0323-4537911"
     elif "hello" in user_input or "hi" in user_input:
         return "Welcome to Sitara Center! How can I help you?"
