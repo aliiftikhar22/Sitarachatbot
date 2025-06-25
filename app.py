@@ -45,7 +45,7 @@ def get_bot_reply(user_input):
         return "Please ask about mobiles, ACs, or electronics. / Bara-e-meherbani mobile ya kisi aur product ka poochein."
 
 # ================================
-# POSTMAN Chatbot Endpoint
+# Postman Test Endpoint
 # ================================
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -54,10 +54,10 @@ def chat():
     return jsonify({"reply": reply})
 
 # ================================
-# Webhook: GET for verification / POST for reply
+# Webhook Endpoint for Messenger
 # ================================
 VERIFY_TOKEN = "sitara123"
-PAGE_ACCESS_TOKEN = "EAAKAfY2l0aQBO0FuWzE6MitKxMl9tATI3IgKQ6WlZAY3fUChpEBbxKvfnYzB8jZCU2f3zmC3UwSzTAJbFJVADvC358YYm1TK0k05A2y3aZBPfIh8txtHXdWZAlD2EMoIfTSJ4YpiC8jScfGdTSszvjqiCXt5SaPePCZBerDIIJWvBdmymZAQufDKGd18q16c0Bls6EI1vD"
+PAGE_ACCESS_TOKEN = "EAAKAfY2l0aQBO0FuWzE6MitKxMl9tATI3IgKQ6WlZAY3fUChpEBbxKvfnYzB8jZCU2f3zmC3UwSzTAJbFJVADvC358YYm1TK0k05A2y3aZBPfIh8txtHXdWZAlD2EMoIfTSJ4YpiC8jScfGdTSszvjqiCXt5SaPePCZBerDIIJWvBdmymZAQufDKGd18q16c0Bls6EI1vD"  
 
 def send_reply(sender_id, reply_text):
     url = f"https://graph.facebook.com/v19.0/me/messages?access_token={PAGE_ACCESS_TOKEN}"
@@ -67,38 +67,38 @@ def send_reply(sender_id, reply_text):
         "message": {"text": reply_text}
     }
     response = requests.post(url, headers=headers, json=payload)
-    print("Facebook API response:", response.status_code, response.text)
+    print("Message sent:", response.status_code, response.text)
 
 @app.route("/webhook", methods=["GET", "POST"])
 def webhook():
-    if request.method == "GET":
-        token = request.args.get("hub.verify_token")
-        challenge = request.args.get("hub.challenge")
-        mode = request.args.get("hub.mode")
-        if token == VERIFY_TOKEN and mode == "subscribe":
-            return challenge, 200
-        return "Invalid verification token", 403
+    if request.method == "GET":
+        token = request.args.get("hub.verify_token")
+        challenge = request.args.get("hub.challenge")
+        mode = request.args.get("hub.mode")
+        if token == VERIFY_TOKEN and mode == "subscribe":
+            return challenge, 200
+        return "Invalid verification token", 403
 
-    elif request.method == "POST":
-        data = request.get_json()
-        print("Webhook data received:", data)
+    elif request.method == "POST":
+        data = request.get_json()
+        print("Webhook data received:", data)
 
-        try:
-            for entry in data.get("entry", []):
-                for messaging_event in entry.get("messaging", []):
-                    sender_id = messaging_event["sender"]["id"]
-                    if "message" in messaging_event:
-                        text = messaging_event["message"].get("text")
-                        print(f"📨 Message from {sender_id}: {text}")
-                        reply_text = get_bot_reply(text)
-                        send_reply(sender_id, reply_text)
-        except Exception as e:
-            print("Webhook error:", e)
+        try:
+            for entry in data.get("entry", []):
+                for messaging_event in entry.get("messaging", []):
+                    sender_id = messaging_event["sender"]["id"]
+                    if "message" in messaging_event:
+                        text = messaging_event["message"].get("text")
+                        print(f"📨 Message from {sender_id}: {text}")
+                        reply_text = get_bot_reply(text)
+                        send_reply(sender_id, reply_text)
+        except Exception as e:
+            print("Webhook error:", e)
 
-        return "Webhook received", 200
+        return "Webhook received", 200
 
 # =====================
-# Render Deployment
+# Required for Render
 # =====================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
